@@ -1,0 +1,89 @@
+from app.mock_data import (
+    MOCK_DRIFT,
+    MOCK_SPILL,
+    MOCK_VESSELS,
+)
+
+from app.services.attribution_engine import (
+    calculate_attribution,
+    rank_vessels,
+)
+
+
+print("\n=== TRACE PHASE 2 PART 1 ===")
+
+
+# ------------------------------------------------------------
+# Test one vessel
+# ------------------------------------------------------------
+
+vessel = MOCK_VESSELS[0]
+
+result = calculate_attribution(
+    vessel=vessel,
+    spill=MOCK_SPILL,
+    drift=MOCK_DRIFT,
+)
+
+print("\n--- Single Vessel ---")
+
+print("MMSI:", result.mmsi)
+print("Vessel:", result.vessel_identity)
+print("Overall Score:", result.overall_score)
+
+print("\nComponent Scores:")
+print(
+    result.component_scores.model_dump()
+)
+
+print("\nExplanations:")
+
+for explanation in result.explanations:
+    print(" -", explanation)
+
+
+# ------------------------------------------------------------
+# Test ranking
+# ------------------------------------------------------------
+
+ranked = rank_vessels(
+    vessels=MOCK_VESSELS,
+    spill=MOCK_SPILL,
+    drift=MOCK_DRIFT,
+)
+
+print("\n--- Ranked Candidates ---")
+
+for index, candidate in enumerate(
+    ranked,
+    start=1,
+):
+    print(
+        f"{index}. "
+        f"{candidate.vessel_identity} "
+        f"({candidate.mmsi}) "
+        f"-> {candidate.overall_score}%"
+    )
+
+
+# ------------------------------------------------------------
+# Basic assertions
+# ------------------------------------------------------------
+
+assert result.overall_score >= 0
+assert result.overall_score <= 100
+
+assert len(result.explanations) > 0
+
+assert len(ranked) == len(MOCK_VESSELS)
+
+for i in range(len(ranked) - 1):
+    assert (
+        ranked[i].overall_score
+        >= ranked[i + 1].overall_score
+    )
+
+
+print("\n✅ Phase 2 Part 1 tests passed.")
+
+
