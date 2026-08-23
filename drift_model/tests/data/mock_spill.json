@@ -1,0 +1,22 @@
+{
+  "spill_id": "SPILL_001",
+  "detection_timestamp": "2026-08-23T10:00:00Z",
+  "location": {
+    "latitude": 20.1234,
+    "longitude": 70.4567
+  },
+  "environmental_forcing": {
+    "wind": {
+      "speed_m_s": 5.5,
+      "direction_deg": 90.0
+    },
+    "current": {
+      "speed_m_s": 0.8,
+      "direction_deg": 120.0
+    }
+  },
+  "simulation_config": {
+    "duration_hours": 12,
+    "time_step_seconds": 3600
+  }
+}
