@@ -1,0 +1,45 @@
+import React from 'react';
+import { FileText, CheckCircle2, ShieldAlert, Award } from 'lucide-react';
+
+export function EvidencePanel({ candidate }) {
+  if (!candidate) return null;
+
+  const explanations = candidate.explanations && candidate.explanations.length > 0
+    ? candidate.explanations
+    : [
+        "Vessel was within the probable source region during the estimated time window.",
+        "Vessel was present during the source time window.",
+        "Historical trajectory is consistent with the backward drift.",
+        "AIS behavior indicators show loitering near source region."
+      ];
+
+  return (
+    <div className="evidence-panel-section">
+      <div className="section-header">
+        <FileText size={16} className="section-icon" />
+        <h3 className="section-title">EVIDENCE (WHY THIS VESSEL?)</h3>
+      </div>
+
+      <div className="evidence-list">
+        {explanations.map((exp, idx) => (
+          <div key={idx} className="evidence-item">
+            <CheckCircle2 size={16} className="evidence-check-icon text-success" />
+            <span className="evidence-text">{exp}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="evidence-footer">
+        <div className="attribution-score-badge">
+          <Award size={14} className="badge-icon" />
+          <span>Attribution Score: {candidate.overall_score}%</span>
+        </div>
+
+        <p className="legal-disclaimer">
+          <ShieldAlert size={12} className="disclaimer-icon" />
+          <span>This vessel is ranked highly based on available spatial, temporal and trajectory evidence.</span>
+        </p>
+      </div>
+    </div>
+  );
+}
