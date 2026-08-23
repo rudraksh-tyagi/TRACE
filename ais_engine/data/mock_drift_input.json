@@ -1,0 +1,22 @@
+{
+  "spill_id": "SPILL_MOCK_001",
+  "detection_timestamp": "2026-08-23T10:00:00Z",
+  "probable_source": {
+    "latitude": 20.2788,
+    "longitude": 70.1016
+  },
+  "source_time_window": {
+    "estimated_spill_time": "2026-08-23T02:00:00Z",
+    "uncertainty_hours": 12
+  },
+  "spatial_uncertainty_km": 5.0,
+  "trajectories": {
+    "forward_forecast": [
+      { "hour": 0, "lat": 20.1234, "lon": 70.4567 }
+    ],
+    "backward_hindcast": [
+      { "hour": 0, "lat": 20.1234, "lon": 70.4567 },
+      { "hour": 12, "lat": 20.2788, "lon": 70.1016 }
+    ]
+  }
+}
