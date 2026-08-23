@@ -38,7 +38,7 @@ export function SatelliteEvidence({ spill }) {
             <div className="spill-polygon-icon"></div>
             <span>Oil Mask GeoJSON</span>
           </div>
-          <div className="sar-meta">{spill?.area_km2 || '14.72'} km² geometry</div>
+          <div className="sar-meta">{spill?.area_km2 != null ? `${spill.area_km2} km² geometry` : 'Geometry available'}</div>
         </div>
       </div>
     </div>

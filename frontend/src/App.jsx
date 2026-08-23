@@ -3,19 +3,15 @@ import { useTheme } from './hooks/useTheme';
 import { useIncidentData } from './hooks/useIncidentData';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
-import { MaritimeMap } from './components/map/MaritimeMap';
-import { SpillIntelligenceCards } from './components/dashboard/SpillIntelligenceCards';
-import { DriftSummaryCard } from './components/dashboard/DriftSummaryCard';
-import { PipelineProgress } from './components/dashboard/PipelineProgress';
-import { ExplainabilityCard } from './components/dashboard/ExplainabilityCard';
-import { TimeSlider } from './components/dashboard/TimeSlider';
-import { VesselTable } from './components/vessels/VesselTable';
-import { VesselSpotlightCard } from './components/vessels/VesselSpotlightCard';
-import { AttributionPanel } from './components/attribution/AttributionPanel';
-import { EvidencePanel } from './components/attribution/EvidencePanel';
-import { SatelliteEvidence } from './components/attribution/SatelliteEvidence';
 import { ErrorState } from './components/common/ErrorState';
 import { LoadingSkeleton } from './components/common/LoadingSkeleton';
+
+import { OverviewView } from './components/views/OverviewView';
+import { SpillView } from './components/views/SpillView';
+import { DriftView } from './components/views/DriftView';
+import { VesselView } from './components/views/VesselView';
+import { AttributionView } from './components/views/AttributionView';
+import { EvidenceView } from './components/views/EvidenceView';
 
 function App() {
   const { theme, toggleTheme } = useTheme();
@@ -43,6 +39,77 @@ function App() {
     return <ErrorState error={error} onRetry={refreshData} />;
   }
 
+  const renderActiveView = () => {
+    switch (activeTab) {
+      case 'spill':
+        return (
+          <SpillView 
+            incident={incident}
+            candidates={candidates}
+            selectedMmsi={selectedMmsi}
+            onSelectCandidate={setSelectedMmsi}
+            visibility={layerVisibility}
+            onToggleLayer={toggleLayer}
+          />
+        );
+      case 'drift':
+        return (
+          <DriftView 
+            incident={incident}
+            candidates={candidates}
+            selectedMmsi={selectedMmsi}
+            onSelectCandidate={setSelectedMmsi}
+            visibility={layerVisibility}
+            onToggleLayer={toggleLayer}
+          />
+        );
+      case 'vessels':
+        return (
+          <VesselView 
+            incident={incident}
+            candidates={candidates}
+            selectedMmsi={selectedMmsi}
+            onSelectCandidate={setSelectedMmsi}
+            selectedCandidate={selectedCandidate}
+            visibility={layerVisibility}
+            onToggleLayer={toggleLayer}
+          />
+        );
+      case 'attribution':
+        return (
+          <AttributionView 
+            candidates={candidates}
+            selectedMmsi={selectedMmsi}
+            onSelectCandidate={setSelectedMmsi}
+            selectedCandidate={selectedCandidate}
+          />
+        );
+      case 'evidence':
+        return (
+          <EvidenceView 
+            incident={incident}
+            candidates={candidates}
+            selectedMmsi={selectedMmsi}
+            onSelectCandidate={setSelectedMmsi}
+            selectedCandidate={selectedCandidate}
+          />
+        );
+      case 'overview':
+      default:
+        return (
+          <OverviewView 
+            incident={incident}
+            candidates={candidates}
+            selectedMmsi={selectedMmsi}
+            onSelectCandidate={setSelectedMmsi}
+            selectedCandidate={selectedCandidate}
+            visibility={layerVisibility}
+            onToggleLayer={toggleLayer}
+          />
+        );
+    }
+  };
+
   return (
     <div className="trace-app-root">
       {/* 1. Command Header */}
@@ -66,49 +133,7 @@ function App() {
 
         {/* 3. Main Dashboard Canvas */}
         <main className="trace-main-content">
-          {/* Top Pipeline Flow Indicator */}
-          <PipelineProgress />
-
-          {/* Top Main Section: Leaflet Map + Right Spill/Drift Intelligence */}
-          <div className="dashboard-top-grid">
-            <MaritimeMap 
-              incident={incident}
-              candidates={candidates}
-              selectedMmsi={selectedMmsi}
-              onSelectCandidate={setSelectedMmsi}
-              visibility={layerVisibility}
-              onToggleLayer={toggleLayer}
-            />
-
-            <div className="dashboard-right-panel">
-              <SpillIntelligenceCards spill={incident?.spill} />
-              <DriftSummaryCard drift={incident?.drift} />
-            </div>
-          </div>
-
-          {/* Time Slider for Drift Hindcast / Forecast Timeline */}
-          <TimeSlider />
-
-          {/* Bottom Main Section: Ranked Candidates Table + Selected Vessel Attribution & Evidence */}
-          <div className="dashboard-bottom-grid">
-            <div className="vessel-table-column">
-              <VesselTable 
-                candidates={candidates}
-                selectedMmsi={selectedMmsi}
-                onSelectCandidate={setSelectedMmsi}
-              />
-            </div>
-
-            <div className="attribution-evidence-column">
-              <VesselSpotlightCard vessel={selectedCandidate} />
-              <AttributionPanel candidate={selectedCandidate} />
-              <EvidencePanel candidate={selectedCandidate} />
-            </div>
-          </div>
-
-          {/* Lower Explainability & Satellite Observation Bridge */}
-          <SatelliteEvidence spill={incident?.spill} />
-          <ExplainabilityCard />
+          {renderActiveView()}
         </main>
       </div>
     </div>
@@ -116,3 +141,4 @@ function App() {
 }
 
 export default App;
+

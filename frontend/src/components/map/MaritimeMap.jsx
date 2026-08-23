@@ -294,7 +294,9 @@ export function MaritimeMap({
           const trajectoryPoints = vessel.trajectory?.map(pt => [pt.lat, pt.lon]) || [];
           const lastPoint = trajectoryPoints.length > 0 
             ? trajectoryPoints[trajectoryPoints.length - 1] 
-            : [18.4 + Math.random() * 0.2, 72.8 + Math.random() * 0.2];
+            : (drift?.origin_coordinates ? [drift.origin_coordinates.lat, drift.origin_coordinates.lon] : (spill?.centroid ? [spill.centroid.lat, spill.centroid.lon] : null));
+
+          if (!lastPoint) return null;
 
           const color = isSelected ? '#F59E0B' : (vessel.overall_score >= 80 ? '#3B82F6' : '#64748B');
 

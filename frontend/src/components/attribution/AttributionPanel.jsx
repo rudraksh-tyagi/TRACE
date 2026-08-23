@@ -6,10 +6,10 @@ export function AttributionPanel({ candidate }) {
 
   const score = candidate.overall_score || 0;
   const comp = candidate.component_scores || {
-    distance_score: 94,
-    time_compatibility_score: 97,
-    trajectory_consistency_score: 88,
-    behavior_score: 72,
+    distance_score: 0,
+    time_compatibility_score: 0,
+    trajectory_consistency_score: 0,
+    behavior_score: 0,
   };
 
   const vesselName = candidate.vessel_name || candidate.vessel_identity || `Vessel ${candidate.mmsi}`;

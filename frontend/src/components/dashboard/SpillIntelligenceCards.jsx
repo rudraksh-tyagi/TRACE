@@ -2,15 +2,16 @@ import React from 'react';
 import { Droplet, ShieldCheck, Maximize, Clock, MapPin, AlertTriangle } from 'lucide-react';
 
 export function SpillIntelligenceCards({ spill }) {
-  const area = spill?.area_km2 ? `${spill.area_km2} km²` : '18.6 km²';
-  const confidence = spill?.confidence ? `${(spill.confidence * 100).toFixed(0)}%` : '94%';
-  const perimeter = spill?.perimeter_km ? `${spill.perimeter_km} km` : '27.4 km';
+  const area = spill?.area_km2 != null ? `${spill.area_km2} km²` : 'Data unavailable';
+  const confidence = spill?.confidence != null ? `${(spill.confidence * 100).toFixed(0)}%` : 'N/A';
+  const perimeter = spill?.perimeter_km != null ? `${spill.perimeter_km} km` : 'Data unavailable';
   const timestamp = spill?.timestamp 
     ? new Date(spill.timestamp).toUTCString().replace('GMT', '(UTC)').replace(/^[^,]+,\s*/, '')
-    : '22 May 2025, 08:15 AM (UTC)';
+    : 'Data unavailable';
   
-  const lat = spill?.centroid?.lat ? `${Math.abs(spill.centroid.lat).toFixed(2)}° N` : '18.42° N';
-  const lon = spill?.centroid?.lon ? `${Math.abs(spill.centroid.lon).toFixed(2)}° E` : '72.81° E';
+  const lat = spill?.centroid?.lat != null ? `${Math.abs(spill.centroid.lat).toFixed(2)}° ${spill.centroid.lat >= 0 ? 'N' : 'S'}` : '';
+  const lon = spill?.centroid?.lon != null ? `${Math.abs(spill.centroid.lon).toFixed(2)}° ${spill.centroid.lon >= 0 ? 'E' : 'W'}` : '';
+  const locationStr = (lat && lon) ? `${lat} ${lon}` : 'Data unavailable';
 
   return (
     <div className="spill-intelligence-section">
@@ -76,8 +77,8 @@ export function SpillIntelligenceCards({ spill }) {
             <MapPin size={15} className="card-icon text-accent" />
             <span className="card-label">LOCATION</span>
           </div>
-          <div className="card-value-sm">{lat} {lon}</div>
-          <div className="card-sub">Arabian Sea</div>
+          <div className="card-value-sm">{locationStr}</div>
+          <div className="card-sub">Centroid Coords</div>
         </div>
       </div>
     </div>

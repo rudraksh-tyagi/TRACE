@@ -39,26 +39,19 @@ export function Header({ health, incidentId, lastUpdated, onRefresh, theme, onTo
 
       <div className="header-right">
         {/* System Online Status */}
-        <div className={`status-pill ${health.online ? 'online' : 'offline'}`}>
+        <div className={`status-pill ${health?.online ? 'online' : 'offline'}`}>
           <span className="status-dot"></span>
           <div className="status-text">
             <span className="status-title">
-              {health.online ? 'SYSTEM ONLINE' : 'BACKEND OFFLINE'}
+              {health?.online ? 'SYSTEM ONLINE' : 'BACKEND OFFLINE'}
             </span>
             <span className="status-desc">
-              {health.online ? 'All Systems Operational' : 'Using Local Fallback'}
+              {health?.online ? 'FastAPI Connected' : 'Backend Unreachable'}
             </span>
           </div>
         </div>
 
-        {/* Demo Mode Badge */}
-        <div className="demo-badge">
-          <Database size={14} className="demo-icon" />
-          <div className="demo-text">
-            <span className="demo-title">DEMO MODE</span>
-            <span className="demo-desc">Using Mock Data</span>
-          </div>
-        </div>
+
 
         {/* Incident ID */}
         <div className="incident-id-box">

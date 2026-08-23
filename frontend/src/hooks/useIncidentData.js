@@ -4,11 +4,10 @@ import { checkHealth, getCompleteIncident, getCandidateVessels } from '../api/in
 export function useIncidentData() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [health, setHealth] = useState({ online: false, mockMode: true });
+  const [health, setHealth] = useState({ online: false, mockMode: false });
   const [incident, setIncident] = useState(null);
   const [vessels, setVessels] = useState([]);
   const [selectedMmsi, setSelectedMmsi] = useState(null);
-  const [isFallback, setIsFallback] = useState(false);
   
   // Layer visibility state for map
   const [layerVisibility, setLayerVisibility] = useState({
@@ -35,24 +34,30 @@ export function useIncidentData() {
       const healthRes = await checkHealth();
       setHealth(healthRes);
 
-      const [incidentRes, vesselsRes] = await Promise.all([
+      if (!healthRes.online) {
+        throw new Error('Unable to connect to TRACE backend server.');
+      }
+
+      // Fetch incident data and vessels in parallel
+      const [incidentData, vesselData] = await Promise.all([
         getCompleteIncident(),
-        getCandidateVessels()
+        getCandidateVessels().catch(() => []) // vessels endpoint is optional fallback if incident state is complete
       ]);
 
-      setIncident(incidentRes.data);
-      setVessels(vesselsRes.data || []);
-      setIsFallback(incidentRes.isFallback || vesselsRes.isFallback);
+      setIncident(incidentData);
+      setVessels(Array.isArray(vesselData) ? vesselData : []);
 
       // Auto select top candidate MMSI
-      if (incidentRes.data?.ranked_candidates?.length > 0) {
-        setSelectedMmsi(incidentRes.data.ranked_candidates[0].mmsi);
-      } else if (vesselsRes.data?.length > 0) {
-        setSelectedMmsi(vesselsRes.data[0].mmsi);
+      if (incidentData?.ranked_candidates?.length > 0) {
+        setSelectedMmsi(incidentData.ranked_candidates[0].mmsi);
+      } else if (Array.isArray(vesselData) && vesselData.length > 0) {
+        setSelectedMmsi(vesselData[0].mmsi);
       }
     } catch (err) {
-      console.error('Failed to load incident data:', err);
+      console.error('TRACE Data Load Error:', err);
       setError(err.message || 'Unable to connect to TRACE backend server.');
+      setIncident(null);
+      setVessels([]);
     } finally {
       setLoading(false);
     }
@@ -70,12 +75,12 @@ export function useIncidentData() {
       const physicalVessel = vessels.find(v => v.mmsi === candidate.mmsi);
       return {
         ...candidate,
-        vessel_name: physicalVessel?.vessel_name || candidate.vessel_identity?.split(' ')[0] || 'Vessel ' + candidate.mmsi.slice(-3),
-        vessel_type: physicalVessel?.vessel_type || 'Tanker',
-        minimum_distance_km: physicalVessel?.minimum_distance_km ?? 12.4,
-        source_window_presence: physicalVessel?.source_window_presence ?? true,
+        vessel_name: physicalVessel?.vessel_name || candidate.vessel_identity || `Vessel ${candidate.mmsi}`,
+        vessel_type: physicalVessel?.vessel_type || 'Unknown Type',
+        minimum_distance_km: physicalVessel?.minimum_distance_km ?? candidate.component_scores?.distance_score != null ? Math.round((100 - candidate.component_scores.distance_score) * 0.5 * 10) / 10 : 'N/A',
+        source_window_presence: physicalVessel?.source_window_presence ?? (candidate.component_scores?.time_compatibility_score > 50),
         time_spent_near_source_min: physicalVessel?.time_spent_near_source_min ?? 0,
-        average_speed: physicalVessel?.average_speed ?? 10.0,
+        average_speed: physicalVessel?.average_speed ?? 0.0,
         course: physicalVessel?.course ?? 0.0,
         ais_gap_detected: physicalVessel?.ais_gap_detected ?? false,
         trajectory: physicalVessel?.trajectory || [],
@@ -95,9 +100,9 @@ export function useIncidentData() {
     selectedMmsi,
     setSelectedMmsi,
     selectedCandidate,
-    isFallback,
     refreshData: loadData,
     layerVisibility,
     toggleLayer,
   };
 }
+

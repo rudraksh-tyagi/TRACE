@@ -52,10 +52,6 @@ export function Sidebar({ activeTab, setActiveTab, health }) {
                 {health.online ? 'Backend Connected' : 'Backend Offline'}
               </span>
             </div>
-            <div className="status-row">
-              <Activity size={12} className="meta-icon" />
-              <span className="status-meta">API Mode: Demo (Mock Data)</span>
-            </div>
           </div>
         </div>
       </div>

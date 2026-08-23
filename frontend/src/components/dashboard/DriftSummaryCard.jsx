@@ -2,17 +2,21 @@ import React from 'react';
 import { Wind, Target, Clock, Compass, Navigation } from 'lucide-react';
 
 export function DriftSummaryCard({ drift }) {
-  const originLat = drift?.origin_coordinates?.lat ? `${Math.abs(drift.origin_coordinates.lat).toFixed(2)}° N` : '18.32° N';
-  const originLon = drift?.origin_coordinates?.lon ? `${Math.abs(drift.origin_coordinates.lon).toFixed(2)}° E` : '72.18° E';
+  const originLat = drift?.origin_coordinates?.lat != null ? `${Math.abs(drift.origin_coordinates.lat).toFixed(2)}° ${drift.origin_coordinates.lat >= 0 ? 'N' : 'S'}` : null;
+  const originLon = drift?.origin_coordinates?.lon != null ? `${Math.abs(drift.origin_coordinates.lon).toFixed(2)}° ${drift.origin_coordinates.lon >= 0 ? 'E' : 'W'}` : null;
+  const originStr = (originLat && originLon) ? `${originLat}, ${originLon}` : 'Data unavailable';
   
   const startTime = drift?.source_time_window?.start_time 
     ? new Date(drift.source_time_window.start_time).toUTCString().slice(17, 22) 
-    : '02:00 AM';
+    : null;
   const endTime = drift?.source_time_window?.end_time 
     ? new Date(drift.source_time_window.end_time).toUTCString().slice(17, 22) 
-    : '03:30 AM';
+    : null;
+  const timeWindowStr = (startTime && endTime) ? `${startTime} - ${endTime} UTC` : 'Data unavailable';
 
-  const uncertainty = drift?.uncertainty_radius_km ? `${drift.uncertainty_radius_km} km` : '25.6 km';
+  const uncertainty = drift?.uncertainty_radius_km != null ? `${drift.uncertainty_radius_km} km` : 'Data unavailable';
+  const backwardCount = drift?.backward_track ? `${drift.backward_track.length} waypoints` : 'Data unavailable';
+  const forecastCount = drift?.forecast_tracks?.length ? `${drift.forecast_tracks.length} tracks` : 'Data unavailable';
 
   return (
     <div className="drift-summary-section">
@@ -27,7 +31,7 @@ export function DriftSummaryCard({ drift }) {
             <Target size={14} className="detail-icon" />
             <span>Probable Source</span>
           </div>
-          <span className="detail-value">{originLat}, {originLon}</span>
+          <span className="detail-value">{originStr}</span>
         </div>
 
         <div className="drift-detail-row">
@@ -35,7 +39,7 @@ export function DriftSummaryCard({ drift }) {
             <Clock size={14} className="detail-icon" />
             <span>Source Time Window</span>
           </div>
-          <span className="detail-value">{startTime} - {endTime} UTC</span>
+          <span className="detail-value">{timeWindowStr}</span>
         </div>
 
         <div className="drift-detail-row">
@@ -49,9 +53,9 @@ export function DriftSummaryCard({ drift }) {
         <div className="drift-detail-row">
           <div className="detail-label-group">
             <Navigation size={14} className="detail-icon" />
-            <span>Backward Drift Length</span>
+            <span>Backward Track</span>
           </div>
-          <span className="detail-value">87.3 km</span>
+          <span className="detail-value">{backwardCount}</span>
         </div>
 
         <div className="drift-detail-row">
@@ -59,7 +63,7 @@ export function DriftSummaryCard({ drift }) {
             <Wind size={14} className="detail-icon text-info" />
             <span>Forward Forecast</span>
           </div>
-          <span className="detail-value text-info font-medium">Available (24h)</span>
+          <span className="detail-value text-info font-medium">{forecastCount}</span>
         </div>
       </div>
     </div>

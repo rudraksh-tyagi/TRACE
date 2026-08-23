@@ -1,10 +1,9 @@
 /**
  * TRACE Incident API Service
- * Wraps backend endpoints with fallback handling for demo resilience
+ * Centralized service layer connecting the frontend with the FastAPI backend.
  */
 
 import { fetchApi } from './client';
-import { FALLBACK_INCIDENT, FALLBACK_VESSELS } from './fallbackData';
 
 export async function checkHealth() {
   try {
@@ -12,53 +11,31 @@ export async function checkHealth() {
     return {
       online: true,
       service: data.service || 'trace-backend',
-      mockMode: data.mock_mode ?? true,
+      mockMode: data.mock_mode ?? false,
     };
   } catch {
     return {
       online: false,
       service: 'trace-backend',
-      mockMode: true,
+      mockMode: false,
     };
   }
 }
 
 export async function getCompleteIncident() {
-  try {
-    const data = await fetchApi('/api/incident/complete');
-    return { data, isFallback: false };
-  } catch {
-    console.warn('Backend API unavailable for /api/incident/complete. Using local static demonstration fallback.');
-    return { data: FALLBACK_INCIDENT, isFallback: true };
-  }
+  return await fetchApi('/api/incident/complete');
 }
 
 export async function getCandidateVessels() {
-  try {
-    const data = await fetchApi('/api/vessels');
-    return { data, isFallback: false };
-  } catch {
-    console.warn('Backend API unavailable for /api/vessels. Using local static demonstration fallback.');
-    return { data: FALLBACK_VESSELS, isFallback: true };
-  }
+  return await fetchApi('/api/vessels');
 }
 
 export async function getSpill() {
-  try {
-    const data = await fetchApi('/api/spill');
-    return { data, isFallback: false };
-  } catch {
-    return { data: FALLBACK_INCIDENT.spill, isFallback: true };
-  }
+  return await fetchApi('/api/spill');
 }
 
 export async function getDrift() {
-  try {
-    const data = await fetchApi('/api/drift');
-    return { data, isFallback: false };
-  } catch {
-    return { data: FALLBACK_INCIDENT.drift, isFallback: true };
-  }
+  return await fetchApi('/api/drift');
 }
 
 export async function getAttribution() {

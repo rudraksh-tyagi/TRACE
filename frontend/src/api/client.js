@@ -3,7 +3,15 @@
  * Configurable HTTP client targeting VITE_API_BASE_URL (default: http://127.0.0.1:8000)
  */
 
-const BASE_URL = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
+const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  if (envUrl === undefined || envUrl === null) {
+    return 'http://127.0.0.1:8000';
+  }
+  return envUrl.replace(/\/$/, '');
+};
+
+const BASE_URL = getBaseUrl();
 
 export async function fetchApi(endpoint, options = {}) {
   const url = `${BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
@@ -38,8 +46,8 @@ export async function fetchApi(endpoint, options = {}) {
 
     return await response.json();
   } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      throw new Error('Backend unreachable. Make sure the FastAPI server is running at ' + BASE_URL);
+    if (error.name === 'TypeError' || error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network')) {
+      throw new Error('Backend unreachable. Make sure the TRACE backend server is running at ' + BASE_URL);
     }
     throw error;
   }

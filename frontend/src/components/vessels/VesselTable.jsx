@@ -62,7 +62,7 @@ export function VesselTable({ candidates, selectedMmsi, onSelectCandidate }) {
                   </td>
                   <td className="mmsi-col">{vessel.mmsi}</td>
                   <td className="type-col">{vessel.vessel_type}</td>
-                  <td className="dist-col">{vessel.minimum_distance_km} km</td>
+                  <td className="dist-col">{typeof vessel.minimum_distance_km === 'number' ? `${vessel.minimum_distance_km} km` : vessel.minimum_distance_km}</td>
                   <td className="presence-col">{getPresenceBadge(vessel)}</td>
                   <td className="score-col font-bold">
                     <span className="score-number">{vessel.overall_score}%</span>
