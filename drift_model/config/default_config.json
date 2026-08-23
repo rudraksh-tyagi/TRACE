@@ -1,0 +1,12 @@
+{
+  "physics": {
+    "earth_radius_m": 6371000.0,
+    "wind_leeway_factor": 0.03,
+    "current_factor": 1.0
+  },
+  "simulation": {
+    "default_duration_hours": 12,
+    "default_time_step_seconds": 3600,
+    "default_spatial_uncertainty_km": 5.0
+  }
+}
