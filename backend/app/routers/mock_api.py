@@ -28,7 +28,7 @@ from fastapi import APIRouter
 from app.config.settings import settings
 from app.exceptions import PipelineStateError
 from app.schemas.schemas import MasterIncidentResponse
-from app.exceptions import PipelineStateError
+from app.services.pipeline_orchestrator import execute_full_pipeline
 from app.schemas.schemas import (
     AttributionSchema,
     DriftSchema,
@@ -341,13 +341,17 @@ async def get_complete_incident() -> MasterIncidentResponse:
         return MOCK_INCIDENT
 
     # --------------------------------------------------------
-    # LIVE MODE WITHOUT DATA
+    # LIVE MODE WITHOUT DATA -> AUTO ORCHESTRATE
     # --------------------------------------------------------
 
-    raise PipelineStateError(
-        "No complete incident is available. "
-        "Ingest upstream data and run the pipeline."
-    )
+    try:
+        logger.info("No active incident stored. Auto-executing full pipeline...")
+        return execute_full_pipeline()
+    except Exception as exc:
+        logger.exception("Auto-orchestration failed in get_complete_incident")
+        raise PipelineStateError(
+            f"No complete incident is available and pipeline execution failed: {exc}"
+        ) from exc
 
 
 # ============================================================
@@ -397,10 +401,14 @@ async def get_incident() -> MasterIncidentResponse:
         return MOCK_INCIDENT
 
     # --------------------------------------------------------
-    # LIVE MODE WITHOUT DATA
+    # LIVE MODE WITHOUT DATA -> AUTO ORCHESTRATE
     # --------------------------------------------------------
 
-    raise PipelineStateError(
-        "No active incident is available. "
-        "Run the TRACE pipeline first."
-    )
+    try:
+        logger.info("No active incident stored. Auto-executing full pipeline...")
+        return execute_full_pipeline()
+    except Exception as exc:
+        logger.exception("Auto-orchestration failed in get_incident")
+        raise PipelineStateError(
+            f"No active incident is available and pipeline execution failed: {exc}"
+        ) from exc

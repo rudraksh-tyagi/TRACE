@@ -1,7 +1,7 @@
 {
     "spill_detected": true,
     "source_image": "2018_09_26.tif",
-    "mask_file": "outputs/oil_mask.tif",
+    "mask_file": "C:\\Users\\mohda\\OneDrive\\Desktop\\SIH\\TRACE\\outputs\\oil_mask.tif",
     "detection_method": {
         "type": "SAR threshold + connected component filtering",
         "threshold_db": -28,

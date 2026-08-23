@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { checkHealth, getCompleteIncident, getCandidateVessels } from '../api/incidentService';
+import { checkHealth, getCompleteIncident, getCandidateVessels, orchestratePipeline } from '../api/incidentService';
 
 export function useIncidentData() {
   const [loading, setLoading] = useState(true);
@@ -63,6 +63,23 @@ export function useIncidentData() {
     }
   }, []);
 
+  const runPipeline = useCallback(async (payload) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await orchestratePipeline(payload);
+      if (result?.incident) {
+        setIncident(result.incident);
+      }
+      await loadData();
+    } catch (err) {
+      console.error('TRACE Pipeline Execution Error:', err);
+      setError(err.message || 'Failed to execute TRACE pipeline.');
+    } finally {
+      setLoading(false);
+    }
+  }, [loadData]);
+
   useEffect(() => {
     loadData();
   }, [loadData]);
@@ -77,7 +94,7 @@ export function useIncidentData() {
         ...candidate,
         vessel_name: physicalVessel?.vessel_name || candidate.vessel_identity || `Vessel ${candidate.mmsi}`,
         vessel_type: physicalVessel?.vessel_type || 'Unknown Type',
-        minimum_distance_km: physicalVessel?.minimum_distance_km ?? candidate.component_scores?.distance_score != null ? Math.round((100 - candidate.component_scores.distance_score) * 0.5 * 10) / 10 : 'N/A',
+        minimum_distance_km: physicalVessel?.minimum_distance_km ?? (candidate.component_scores?.distance_score != null ? Math.round((100 - candidate.component_scores.distance_score) * 0.5 * 10) / 10 : 'N/A'),
         source_window_presence: physicalVessel?.source_window_presence ?? (candidate.component_scores?.time_compatibility_score > 50),
         time_spent_near_source_min: physicalVessel?.time_spent_near_source_min ?? 0,
         average_speed: physicalVessel?.average_speed ?? 0.0,
@@ -101,6 +118,7 @@ export function useIncidentData() {
     setSelectedMmsi,
     selectedCandidate,
     refreshData: loadData,
+    runPipeline,
     layerVisibility,
     toggleLayer,
   };

@@ -57,6 +57,7 @@ from app.schemas.schemas import (
 )
 
 from app.services.attribution_engine import rank_vessels
+from app.services.pipeline_orchestrator import execute_full_pipeline
 from app.services.state_manager import state_manager
 from app.config.settings import settings
 from app.exceptions import PipelineStateError
@@ -218,6 +219,20 @@ class PipelineRunResponse(BaseModel):
     incident: MasterIncidentResponse = Field(
         ...,
         description="Complete generated incident.",
+    )
+
+
+class OrchestrationRequest(BaseModel):
+    """Optional parameters for full pipeline orchestration."""
+
+    sar_image_path: Optional[str] = Field(
+        default=None,
+        description="Optional path to custom Sentinel-1 SAR image TIFF.",
+    )
+
+    ais_csv_path: Optional[str] = Field(
+        default=None,
+        description="Optional path to custom AIS telemetry CSV file.",
     )
 
 
@@ -511,6 +526,47 @@ async def ingest_vessels(
 
 
 # ============================================================
+# ORCHESTRATE COMPLETE END-TO-END PIPELINE
+# ============================================================
+
+@router.post(
+    "/orchestrate",
+    response_model=PipelineRunResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Orchestrate complete end-to-end TRACE pipeline",
+)
+async def orchestrate_pipeline(
+    request: Optional[OrchestrationRequest] = None,
+) -> PipelineRunResponse:
+    """
+    Orchestrate the complete end-to-end processing pipeline:
+        AI/ML -> GIS Vectorizer -> Drift Model -> AIS Engine -> Attribution Engine
+    """
+    logger.info("End-to-end orchestration endpoint called.")
+    sar_path = request.sar_image_path if request else None
+    ais_path = request.ais_csv_path if request else None
+
+    try:
+        incident = execute_full_pipeline(image_path=sar_path, ais_csv_path=ais_path)
+    except Exception as exc:
+        logger.exception("Full pipeline orchestration failed.")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Pipeline orchestration failed: {str(exc)}",
+        ) from exc
+
+    top_cand = incident.ranked_candidates[0] if incident.ranked_candidates else None
+    return PipelineRunResponse(
+        status="success",
+        message="TRACE end-to-end pipeline orchestrated successfully.",
+        incident_id=incident.incident_id,
+        candidate_count=len(incident.ranked_candidates),
+        top_candidate=top_cand,
+        incident=incident,
+    )
+
+
+# ============================================================
 # RUN PIPELINE
 # ============================================================
 
@@ -523,85 +579,15 @@ async def ingest_vessels(
 async def run_pipeline() -> PipelineRunResponse:
     """
     Execute the complete TRACE attribution pipeline.
-
-    Required inputs:
-
-        1. GIS spill
-        2. Drift reconstruction
-        3. AIS candidate vessels
-
-    Processing:
-
-        upstream inputs
-             ↓
-        attribution engine
-             ↓
-        ranked candidates
-             ↓
-        MasterIncidentResponse
-             ↓
-        IncidentStateManager
-             ↓
-        memory + JSON persistence
+    Auto-orchestrates upstream modules if inputs are missing.
     """
 
-    logger.info(
-        "Pipeline execution requested."
-    )
+    logger.info("Pipeline execution requested.")
 
-    # ========================================================
-    # VALIDATE GIS
-    # ========================================================
-
-    if pipeline_inputs.spill is None:
-
-        logger.error(
-            "Pipeline failed: GIS spill missing."
-        )
-
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=(
-                "Cannot run pipeline: GIS spill data "
-                "has not been ingested."
-            ),
-        )
-
-    # ========================================================
-    # VALIDATE DRIFT
-    # ========================================================
-
-    if pipeline_inputs.drift is None:
-
-        logger.error(
-            "Pipeline failed: drift data missing."
-        )
-
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=(
-                "Cannot run pipeline: drift data "
-                "has not been ingested."
-            ),
-        )
-
-    # ========================================================
-    # VALIDATE AIS
-    # ========================================================
-
-    if not pipeline_inputs.vessels:
-
-        logger.error(
-            "Pipeline failed: AIS candidates missing."
-        )
-
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=(
-                "Cannot run pipeline: AIS candidate vessels "
-                "have not been ingested."
-            ),
-        )
+    # Auto-orchestrate if any upstream inputs are missing
+    if pipeline_inputs.spill is None or pipeline_inputs.drift is None or not pipeline_inputs.vessels:
+        logger.info("Upstream inputs incomplete. Executing full pipeline orchestration...")
+        return await orchestrate_pipeline()
 
     # ========================================================
     # RETRIEVE INPUTS

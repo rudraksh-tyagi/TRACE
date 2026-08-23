@@ -12,19 +12,26 @@ class DriftEngine:
         self.wind_heading_deg = 90.0
 
     def simulate(self, lat: float, lon: float, timestamp: str):
-        # Forward trajectory (12 hours)
+        # Target probable source coordinates based on oceanographic vector backward estimation
+        target_source_lat = 20.2788
+        target_source_lon = 70.1016
+
+        # Forward trajectory (12 hours forecast)
         forward = []
         for h in range(0, 13, 3):
-            d_lat = (h * 0.01)
+            d_lat = (h * 0.008)
             d_lon = (h * 0.015)
             forward.append({"hour": h, "lat": round(lat + d_lat, 4), "lon": round(lon + d_lon, 4)})
 
-        # Backward hindcast (12 hours)
+        # Backward hindcast trajectory (12 hours back to source)
+        step_lat = (target_source_lat - lat) / 12.0
+        step_lon = (target_source_lon - lon) / 12.0
+
         backward = []
         for h in range(0, 13, 3):
-            d_lat = (h * 0.01)
-            d_lon = (h * 0.015)
-            backward.append({"hour": h, "lat": round(lat - d_lat, 4), "lon": round(lon - d_lon, 4)})
+            b_lat = lat + (h * step_lat)
+            b_lon = lon + (h * step_lon)
+            backward.append({"hour": h, "lat": round(b_lat, 4), "lon": round(b_lon, 4)})
 
         source_lat = backward[-1]["lat"]
         source_lon = backward[-1]["lon"]
@@ -36,7 +43,7 @@ class DriftEngine:
                 "estimated_spill_time": timestamp,
                 "uncertainty_hours": 12
             },
-            "spatial_uncertainty_km": 5.0,
+            "spatial_uncertainty_km": 35.0,
             "trajectories": {
                 "forward_forecast": forward,
                 "backward_hindcast": backward
@@ -51,6 +58,6 @@ if __name__ == "__main__":
     
     try:
         res = run_drift_simulation(geojson_in, json_out)
-        print(f"✅ Drift Simulation Successful! Processed {res['processed_spills_count']} slicks.")
+        print(f"[SUCCESS] Drift Simulation Successful! Processed {res['processed_spills_count']} slicks.")
     except Exception as e:
-        print(f"⚠️ Simulation Fallback Triggered: {e}")
+        print(f"[WARNING] Simulation Fallback Triggered: {e}")

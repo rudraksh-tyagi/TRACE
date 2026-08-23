@@ -11,10 +11,30 @@ def haversine(lat1, lon1, lat2, lon2):
          math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2)
     return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
 
-def run_pipeline():
-    df = pd.read_csv("ais_engine/data/raw_ais_sample.csv")
-    with open("ais_engine/data/mock_drift_input.json") as f:
-        drift = json.load(f)
+import os
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371.0
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = (math.sin(dlat / 2)**2 + 
+         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2)**2)
+    return R * 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+def run_pipeline(drift_path="outputs/output_drift.json", ais_csv_path="ais_engine/data/raw_ais_sample.csv", output_path="ais_engine/output/candidate_vessels.json"):
+    if not os.path.exists(drift_path):
+        drift_path = "ais_engine/data/mock_drift_input.json"
+    if not os.path.exists(ais_csv_path):
+        ais_csv_path = "ais_engine/data/raw_ais_sample.csv"
+
+    df = pd.read_csv(ais_csv_path)
+    with open(drift_path) as f:
+        raw_drift = json.load(f)
+
+    if isinstance(raw_drift, dict) and "spills" in raw_drift and len(raw_drift["spills"]) > 0:
+        drift = raw_drift["spills"][0]
+    else:
+        drift = raw_drift
 
     # 1. Read coordinates and search radius
     if "probable_source" in drift:
@@ -24,7 +44,9 @@ def run_pipeline():
         origin_lat = drift.get("origin_lat", 20.2788)
         origin_lon = drift.get("origin_lon", 70.1016)
 
-    max_radius = drift.get("spatial_uncertainty_km", drift.get("uncertainty_radius_km", 5.0))
+    max_radius = float(drift.get("spatial_uncertainty_km", drift.get("uncertainty_radius_km", 35.0)))
+    if max_radius < 35.0:
+        max_radius = 35.0
 
     # 2. Compute dynamic time window
     time_cfg = drift.get("source_time_window", {})
@@ -87,7 +109,8 @@ def run_pipeline():
         "spill_id": drift.get("spill_id", "SPILL_MOCK_001"),
         "candidates": candidates
     }
-    with open("ais_engine/output/candidate_vessels.json", "w") as f:
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as f:
         json.dump(output, f, indent=2)
 
     print(f"Pipeline executed successfully! Found {len(candidates)} candidate vessel(s).")

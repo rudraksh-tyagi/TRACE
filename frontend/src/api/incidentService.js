@@ -43,6 +43,13 @@ export async function getAttribution() {
     const data = await fetchApi('/api/attribution');
     return { data, isFallback: false };
   } catch {
-    return { data: FALLBACK_INCIDENT.ranked_candidates, isFallback: true };
+    return { data: [], isFallback: true };
   }
+}
+
+export async function orchestratePipeline(payload = {}) {
+  return await fetchApi('/api/orchestrate', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 }

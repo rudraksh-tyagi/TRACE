@@ -13,7 +13,7 @@ def run_gis_vectorization(
 ):
     # 1. Load Role 1's JSON metadata
     if not os.path.exists(metadata_path):
-        print(f"❌ Error: Could not find '{metadata_path}'. Make sure Role 1 has run their pipeline!")
+        print(f"[ERROR] Could not find '{metadata_path}'. Make sure Role 1 has run their pipeline!")
         return
 
     with open(metadata_path, "r") as f:
@@ -22,10 +22,10 @@ def run_gis_vectorization(
     tif_path = role1_metadata.get("mask_file", "outputs/oil_mask.tif")
 
     if not os.path.exists(tif_path):
-        print(f"❌ Error: Could not find raster mask at '{tif_path}'")
+        print(f"[ERROR] Could not find raster mask at '{tif_path}'")
         return
 
-    print(f"🌐 Processing Role 1 mask: {tif_path} ...")
+    print(f"[GIS] Processing Role 1 mask: {tif_path} ...")
 
     features = []
 
@@ -103,7 +103,7 @@ def run_gis_vectorization(
     with open(output_geojson_path, "w") as f:
         json.dump(geojson_payload, f, indent=2)
 
-    print(f"✅ Handoff Complete! Extracted {len(features)} polygon region(s) and saved to '{output_geojson_path}'")
+    print(f"[SUCCESS] Handoff Complete! Extracted {len(features)} polygon region(s) and saved to '{output_geojson_path}'")
 
 if __name__ == "__main__":
     run_gis_vectorization()

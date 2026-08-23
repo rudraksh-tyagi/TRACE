@@ -1,0 +1,76 @@
+{
+  "status": "success",
+  "processed_spills_count": 1,
+  "spills": [
+    {
+      "detection_timestamp": "2026-08-23T10:00:00Z",
+      "probable_source": {
+        "latitude": 19.9798,
+        "longitude": 70.3202
+      },
+      "source_time_window": {
+        "estimated_spill_time": "2026-08-23T10:00:00Z",
+        "uncertainty_hours": 12
+      },
+      "spatial_uncertainty_km": 35.0,
+      "trajectories": {
+        "forward_forecast": [
+          {
+            "hour": 0,
+            "lat": 20.0998,
+            "lon": 70.5002
+          },
+          {
+            "hour": 3,
+            "lat": 20.1298,
+            "lon": 70.5452
+          },
+          {
+            "hour": 6,
+            "lat": 20.1598,
+            "lon": 70.5902
+          },
+          {
+            "hour": 9,
+            "lat": 20.1898,
+            "lon": 70.6352
+          },
+          {
+            "hour": 12,
+            "lat": 20.2198,
+            "lon": 70.6802
+          }
+        ],
+        "backward_hindcast": [
+          {
+            "hour": 0,
+            "lat": 20.0998,
+            "lon": 70.5002
+          },
+          {
+            "hour": 3,
+            "lat": 20.0698,
+            "lon": 70.4552
+          },
+          {
+            "hour": 6,
+            "lat": 20.0398,
+            "lon": 70.4102
+          },
+          {
+            "hour": 9,
+            "lat": 20.0098,
+            "lon": 70.3652
+          },
+          {
+            "hour": 12,
+            "lat": 19.9798,
+            "lon": 70.3202
+          }
+        ]
+      },
+      "spill_id": "spill_001",
+      "area_sq_km": 1.0
+    }
+  ]
+}

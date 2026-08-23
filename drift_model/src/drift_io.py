@@ -22,9 +22,13 @@ def parse_geojson_input(geojson_path: str):
         props = feature.get("properties", {})
         geometry = feature.get("geometry", {})
         
-        centroid = props.get("centroid", {})
-        lat = centroid.get("lat") or props.get("latitude")
-        lon = centroid.get("lon") or props.get("longitude")
+        centroid_lon_lat = props.get("centroid_lon_lat", [])
+        if centroid_lon_lat and len(centroid_lon_lat) >= 2:
+            lon, lat = centroid_lon_lat[0], centroid_lon_lat[1]
+        else:
+            centroid = props.get("centroid", {})
+            lat = centroid.get("lat") or props.get("latitude")
+            lon = centroid.get("lon") or props.get("longitude")
         
         if lat is None or lon is None:
             if geometry.get("type") == "Polygon":
