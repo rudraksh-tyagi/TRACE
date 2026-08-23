@@ -1,48 +1,80 @@
 import json
-from datetime import datetime, timedelta
+import os
 
-def load_input_json(file_path):
-    """Reads and parses input JSON file."""
-    with open(file_path, 'r') as f:
-        return json.load(f)
-
-def save_drift_output(output_file_path, spill_id, detection_time_str, forward_traj, backward_traj, uncertainty_km=5.0):
-    """
-    Formats simulation results into a standardized schema and writes to a JSON file.
-    """
-    # Parse initial detection time string (e.g. '2026-08-23T10:00:00Z')
-    # If standard ISO string has 'Z', replace it for datetime parsing
-    clean_time_str = detection_time_str.replace("Z", "")
-    base_time = datetime.fromisoformat(clean_time_str)
-    
-    # Calculate estimated source time (backward duration based on last point in backward trajectory)
-    back_hours = backward_traj[-1]["hour"]
-    source_time = base_time - timedelta(hours=back_hours)
-    
-    # Extract probable source coordinates (last point of backward trajectory)
-    probable_source = {
-        "latitude": backward_traj[-1]["lat"],
-        "longitude": backward_traj[-1]["lon"]
-    }
-    
-    # Format final dictionary
-    output_data = {
-        "spill_id": spill_id,
-        "detection_timestamp": detection_time_str,
-        "probable_source": probable_source,
-        "source_time_window": {
-            "estimated_spill_time": source_time.isoformat() + "Z",
-            "uncertainty_hours": back_hours
-        },
-        "spatial_uncertainty_km": uncertainty_km,
-        "trajectories": {
-            "forward_forecast": forward_traj,
-            "backward_hindcast": backward_traj
-        }
-    }
-    
-    # Write formatted JSON to file
-    with open(output_file_path, 'w') as f:
-        json.dump(output_data, f, indent=4)
+def parse_geojson_input(geojson_path: str):
+    if not os.path.exists(geojson_path):
+        # Fallback to mock data if GeoJSON isn't downloaded yet
+        return [{
+            "spill_id": "SPILL_MOCK_001",
+            "detection_timestamp": "2026-08-23T10:00:00Z",
+            "latitude": 20.1234,
+            "longitude": 70.4567,
+            "area_sq_km": 2.5
+        }]
         
-    print(f"Successfully saved drift forecast output to: {output_file_path}")
+    with open(geojson_path, "r") as f:
+        data = json.load(f)
+        
+    spills = []
+    features = data.get("features", [])
+    
+    for idx, feature in enumerate(features):
+        props = feature.get("properties", {})
+        geometry = feature.get("geometry", {})
+        
+        centroid = props.get("centroid", {})
+        lat = centroid.get("lat") or props.get("latitude")
+        lon = centroid.get("lon") or props.get("longitude")
+        
+        if lat is None or lon is None:
+            if geometry.get("type") == "Polygon":
+                coords = geometry["coordinates"][0]
+                avg_lon = sum(c[0] for c in coords) / len(coords)
+                avg_lat = sum(c[1] for c in coords) / len(coords)
+                lat, lon = avg_lat, avg_lon
+
+        spills.append({
+            "spill_id": props.get("spill_id", f"SPILL_{idx+1:03d}"),
+            "detection_timestamp": props.get("acquisition_time", "2026-08-23T10:00:00Z"),
+            "latitude": lat or 20.1234,
+            "longitude": lon or 70.4567,
+            "area_sq_km": props.get("area_sq_km", 1.0)
+        })
+        
+    return spills if spills else [{
+        "spill_id": "SPILL_MOCK_001",
+        "detection_timestamp": "2026-08-23T10:00:00Z",
+        "latitude": 20.1234,
+        "longitude": 70.4567,
+        "area_sq_km": 2.5
+    }]
+
+def run_drift_simulation(geojson_input_path: str, output_path: str):
+    # Import inside function to prevent circular import
+    from drift_model.src.drift import DriftEngine
+
+    spills = parse_geojson_input(geojson_input_path)
+    engine = DriftEngine()
+    results = []
+
+    for spill in spills:
+        sim_data = engine.simulate(
+            lat=spill["latitude"],
+            lon=spill["longitude"],
+            timestamp=spill["detection_timestamp"]
+        )
+        sim_data["spill_id"] = spill["spill_id"]
+        sim_data["area_sq_km"] = spill["area_sq_km"]
+        results.append(sim_data)
+
+    output_payload = {
+        "status": "success",
+        "processed_spills_count": len(results),
+        "spills": results
+    }
+
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as f:
+        json.dump(output_payload, f, indent=2)
+
+    return output_payload

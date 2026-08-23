@@ -11,7 +11,7 @@ detection timestamp
 
 B. Environmental conditions
 
-wind speed
+wind speedgit commit -m "docs(drift_model): updgit commit -m "docs(drift_model): update module documentation and final folder structure"ate module documentation and final folder structure"
 wind direction
 current speed
 current direction
