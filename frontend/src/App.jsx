@@ -27,6 +27,7 @@ function App() {
     setSelectedMmsi,
     selectedCandidate,
     refreshData,
+    runPipeline,
     layerVisibility,
     toggleLayer,
   } = useIncidentData();
@@ -118,6 +119,7 @@ function App() {
         incidentId={incident?.incident_id}
         lastUpdated={incident?.metadata?.generation_timestamp}
         onRefresh={refreshData}
+        onRunPipeline={runPipeline}
         theme={theme}
         onToggleTheme={toggleTheme}
         loading={loading}

@@ -162,8 +162,8 @@ curl -X POST "http://127.0.0.1:8000/api/orchestrate" \
   "incident_id": "spill_001",
   "candidate_count": 3,
   "top_candidate": {
-    "mmsi": "413123456",
-    "vessel_identity": "PACIFIC STAR",
+    "mmsi": "419001234",
+    "vessel_identity": "MT OCEAN PRIDE",
     "overall_score": 88.75,
     "component_scores": {
       "distance_score": 88.0,

@@ -7,10 +7,11 @@ import {
   Sun, 
   Moon, 
   Copy, 
-  Check 
+  Check,
+  Play
 } from 'lucide-react';
 
-export function Header({ health, incidentId, lastUpdated, onRefresh, theme, onToggleTheme, loading }) {
+export function Header({ health, incidentId, lastUpdated, onRefresh, onRunPipeline, theme, onToggleTheme, loading }) {
   const [copied, setCopied] = React.useState(false);
 
   const handleCopyId = () => {
@@ -69,6 +70,17 @@ export function Header({ health, incidentId, lastUpdated, onRefresh, theme, onTo
           <span className="updated-label">LAST UPDATED</span>
           <span className="updated-value">{formattedDate}</span>
         </div>
+
+        {/* Run Pipeline Action */}
+        <button 
+          className={`run-pipeline-btn ${loading ? 'loading' : ''}`} 
+          onClick={onRunPipeline}
+          disabled={loading}
+          title="Run TRACE Pipeline Analysis"
+        >
+          <Play size={14} className={loading ? 'spin' : ''} />
+          <span>Run Pipeline</span>
+        </button>
 
         {/* Refresh Action */}
         <button 

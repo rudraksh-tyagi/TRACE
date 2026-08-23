@@ -329,6 +329,37 @@ button {
 }
 
 /* Header Buttons */
+.run-pipeline-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.run-pipeline-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.5);
+  transform: translateY(-1px);
+}
+
+.run-pipeline-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.run-pipeline-btn.loading .spin {
+  animation: spin 1s linear infinite;
+}
+
 .refresh-btn {
   display: flex;
   align-items: center;

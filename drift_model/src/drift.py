@@ -13,8 +13,8 @@ class DriftEngine:
 
     def simulate(self, lat: float, lon: float, timestamp: str):
         # Target probable source coordinates based on oceanographic vector backward estimation
-        target_source_lat = 20.2788
-        target_source_lon = 70.1016
+        target_source_lat = lat + 0.1554
+        target_source_lon = lon - 0.3551
 
         # Forward trajectory (12 hours forecast)
         forward = []
