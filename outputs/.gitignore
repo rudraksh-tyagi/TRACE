@@ -1,0 +1,7 @@
+# Ignore heavy image files and previews
+*.tif
+*.png
+
+# Python cache files
+__pycache__/
+*.pyc
