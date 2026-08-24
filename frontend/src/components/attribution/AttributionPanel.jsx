@@ -31,7 +31,7 @@ export function AttributionPanel({ candidate }) {
       <div className="attribution-content-grid">
         {/* Left Donut Gauge */}
         <div className="score-donut-box">
-          <span className="box-label">OVERALL ATTRIBUTION SCORE</span>
+          <span className="box-label">OVERALL SOURCE COMPATIBILITY SCORE</span>
           <div className="donut-wrapper">
             <svg width="120" height="120" viewBox="0 0 100 100">
               <circle

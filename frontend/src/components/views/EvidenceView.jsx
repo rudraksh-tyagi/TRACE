@@ -97,7 +97,7 @@ export function EvidenceView({ incident, candidates, selectedMmsi, onSelectCandi
                 ))}
               </div>
             ) : (
-              <p className="text-muted">Evidence unavailable for the selected candidate.</p>
+              <p className="text-muted">No evidence available</p>
             )}
 
             <div className="legal-notice-box">

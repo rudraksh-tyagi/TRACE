@@ -1,8 +1,6 @@
 import React from 'react';
 import { 
   Anchor, 
-  Activity, 
-  Database, 
   RefreshCw, 
   Sun, 
   Moon, 
@@ -10,6 +8,39 @@ import {
   Check,
   Play
 } from 'lucide-react';
+
+function formatToIST(dateString) {
+  if (!dateString) return 'N/A';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Asia/Kolkata',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(date);
+    const getPart = (type) => parts.find(p => p.type === type)?.value || '';
+
+    const day = getPart('day');
+    const month = getPart('month');
+    const year = getPart('year');
+    const hour = getPart('hour');
+    const minute = getPart('minute');
+    const second = getPart('second');
+
+    return `${day} ${month} ${year} ${hour}:${minute}:${second} (IST)`;
+  } catch {
+    return 'N/A';
+  }
+}
 
 export function Header({ health, incidentId, lastUpdated, onRefresh, onRunPipeline, theme, onToggleTheme, loading }) {
   const [copied, setCopied] = React.useState(false);
@@ -22,9 +53,7 @@ export function Header({ health, incidentId, lastUpdated, onRefresh, onRunPipeli
     }
   };
 
-  const formattedDate = lastUpdated 
-    ? new Date(lastUpdated).toUTCString().replace('GMT', '(UTC)').replace(/^[^,]+,\s*/, '')
-    : '22 May 2025, 10:45 AM (UTC)';
+  const formattedDate = formatToIST(lastUpdated);
 
   return (
     <header className="trace-header">
@@ -39,7 +68,7 @@ export function Header({ health, incidentId, lastUpdated, onRefresh, onRunPipeli
       </div>
 
       <div className="header-right">
-        {/* System Online Status */}
+        {/* System Connection Status */}
         <div className={`status-pill ${health?.online ? 'online' : 'offline'}`}>
           <span className="status-dot"></span>
           <div className="status-text">
@@ -52,16 +81,16 @@ export function Header({ health, incidentId, lastUpdated, onRefresh, onRunPipeli
           </div>
         </div>
 
-
-
         {/* Incident ID */}
         <div className="incident-id-box">
           <span className="id-label">INCIDENT ID</span>
           <div className="id-value-group">
-            <span className="id-value">{incidentId || 'TRC-001'}</span>
-            <button className="copy-btn" onClick={handleCopyId} title="Copy Incident ID">
-              {copied ? <Check size={13} className="text-success" /> : <Copy size={13} />}
-            </button>
+            <span className="id-value">{incidentId || 'N/A'}</span>
+            {incidentId && (
+              <button className="copy-btn" onClick={handleCopyId} title="Copy Incident ID">
+                {copied ? <Check size={13} className="text-success" /> : <Copy size={13} />}
+              </button>
+            )}
           </div>
         </div>
 

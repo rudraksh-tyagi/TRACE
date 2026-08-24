@@ -19,6 +19,7 @@ function App() {
 
   const {
     loading,
+    loadingMessage,
     error,
     health,
     incident,
@@ -26,6 +27,7 @@ function App() {
     selectedMmsi,
     setSelectedMmsi,
     selectedCandidate,
+    lastUpdated,
     refreshData,
     runPipeline,
     layerVisibility,
@@ -33,7 +35,7 @@ function App() {
   } = useIncidentData();
 
   if (loading && !incident) {
-    return <LoadingSkeleton />;
+    return <LoadingSkeleton message={loadingMessage} />;
   }
 
   if (error && !incident) {
@@ -117,7 +119,7 @@ function App() {
       <Header 
         health={health}
         incidentId={incident?.incident_id}
-        lastUpdated={incident?.metadata?.generation_timestamp}
+        lastUpdated={lastUpdated}
         onRefresh={refreshData}
         onRunPipeline={runPipeline}
         theme={theme}
@@ -143,4 +145,3 @@ function App() {
 }
 
 export default App;
-

@@ -38,7 +38,7 @@ export function SpillView({ incident, candidates, selectedMmsi, onSelectCandidat
           </div>
         </div>
         <div className="view-id-badge">
-          <span>SPILL ID: <strong>{spill.spill_id || 'SP001'}</strong></span>
+          <span>SPILL ID: <strong>{spill.spill_id || 'N/A'}</strong></span>
         </div>
       </div>
 
