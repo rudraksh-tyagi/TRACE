@@ -43,31 +43,7 @@ export async function getAttribution() {
 }
 
 export async function runPipelineApi() {
-  try {
-    return await fetchApi('/api/run-pipeline', { method: 'POST' });
-  } catch (initialErr) {
-    // If backend pipeline input buffer is uninitialized (causing 500 error in orchestrate mode),
-    // ingest backend spill, drift, and vessel data into backend input store first
-    try {
-      const [spill, drift, vessels] = await Promise.all([
-        fetchApi('/api/spill'),
-        fetchApi('/api/drift'),
-        fetchApi('/api/vessels'),
-      ]);
-
-      if (spill && drift && vessels && Array.isArray(vessels) && vessels.length > 0) {
-        await fetchApi('/api/ingest/spill', { method: 'POST', body: JSON.stringify(spill) });
-        await fetchApi('/api/ingest/drift', { method: 'POST', body: JSON.stringify(drift) });
-        await fetchApi('/api/ingest/vessels', { method: 'POST', body: JSON.stringify(vessels) });
-        
-        // Retry backend run-pipeline execution after populating backend inputs
-        return await fetchApi('/api/run-pipeline', { method: 'POST' });
-      }
-    } catch {
-      // Re-throw initial pipeline execution error if fallback fails
-    }
-    throw initialErr;
-  }
+  return await fetchApi('/api/run-pipeline', { method: 'POST' });
 }
 
 export async function orchestratePipeline(payload = {}) {

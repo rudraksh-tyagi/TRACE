@@ -1,5 +1,4 @@
-import React from 'react';
-import { Ship, Navigation, Gauge, Clock, AlertTriangle, ChevronRight, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Ship, Navigation } from 'lucide-react';
 import { MaritimeMap } from '../map/MaritimeMap';
 import { VesselTable } from '../vessels/VesselTable';
 import { VesselSpotlightCard } from '../vessels/VesselSpotlightCard';
@@ -76,8 +75,8 @@ export function VesselView({ incident, candidates, selectedMmsi, onSelectCandida
                       <tr key={i}>
                         <td>{i + 1}</td>
                         <td>{new Date(pt.timestamp).toUTCString().slice(0, 22)}</td>
-                        <td>{pt.lat.toFixed(4)}° N</td>
-                        <td>{pt.lon.toFixed(4)}° E</td>
+                        <td>{Math.abs(pt.lat).toFixed(4)}° {pt.lat >= 0 ? 'N' : 'S'}</td>
+                        <td>{Math.abs(pt.lon).toFixed(4)}° {pt.lon >= 0 ? 'E' : 'W'}</td>
                       </tr>
                     ))}
                   </tbody>

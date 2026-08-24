@@ -1,4 +1,3 @@
-import React from 'react';
 import { Anchor } from 'lucide-react';
 
 export function LoadingSkeleton({ message }) {

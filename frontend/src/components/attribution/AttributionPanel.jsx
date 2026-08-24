@@ -1,5 +1,4 @@
-import React from 'react';
-import { Target, Award } from 'lucide-react';
+import { Target } from 'lucide-react';
 
 export function AttributionPanel({ candidate }) {
   if (!candidate) return null;
@@ -53,7 +52,9 @@ export function AttributionPanel({ candidate }) {
             </svg>
             <div className="donut-center-text">
               <span className="donut-number">{score}%</span>
-              <span className="donut-sub">High Confidence</span>
+              <span className="donut-sub">
+                {score >= 80 ? 'High Confidence' : (score >= 50 ? 'Moderate Confidence' : 'Low Confidence')}
+              </span>
             </div>
           </div>
         </div>

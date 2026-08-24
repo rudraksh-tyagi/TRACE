@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Clock, Play, Pause } from 'lucide-react';
 
 export function TimeSlider() {
@@ -23,7 +23,7 @@ export function TimeSlider() {
       <div className="slider-header">
         <div className="title-group">
           <Clock size={14} className="icon" />
-          <span>DRIFT TIMELINE SLIDER</span>
+          <span>PROTOTYPE TIMELINE CONTROL</span>
         </div>
         <div className="active-time-readout">
           {steps[activeStep].label} ({steps[activeStep].desc})

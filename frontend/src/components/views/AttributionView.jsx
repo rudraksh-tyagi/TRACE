@@ -1,4 +1,3 @@
-import React from 'react';
 import { Target, Award, Ship, ChevronRight, BarChart3 } from 'lucide-react';
 import { AttributionPanel } from '../attribution/AttributionPanel';
 import { VesselSpotlightCard } from '../vessels/VesselSpotlightCard';

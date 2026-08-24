@@ -1,4 +1,3 @@
-import React from 'react';
 import { MaritimeMap } from '../map/MaritimeMap';
 import { SpillIntelligenceCards } from '../dashboard/SpillIntelligenceCards';
 import { DriftSummaryCard } from '../dashboard/DriftSummaryCard';
@@ -23,7 +22,7 @@ export function OverviewView({
   return (
     <>
       {/* Top Pipeline Flow Indicator */}
-      <PipelineProgress />
+      <PipelineProgress incident={incident} />
 
       {/* Top Main Section: Leaflet Map + Right Spill/Drift Intelligence */}
       <div className="dashboard-top-grid">

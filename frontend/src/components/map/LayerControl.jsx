@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Layers, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState } from 'react';
+import { Layers, X, ChevronDown } from 'lucide-react';
 
 export function LayerControl({ visibility, onToggle }) {
   const [isOpen, setIsOpen] = useState(true);

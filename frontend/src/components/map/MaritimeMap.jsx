@@ -13,7 +13,7 @@ import {
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { LayerControl } from './LayerControl';
-import { Maximize2, Compass } from 'lucide-react';
+import { Compass } from 'lucide-react';
 
 // Fix default leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -135,7 +135,7 @@ export function MaritimeMap({
     if (spill?.centroid) {
       return [spill.centroid.lat, spill.centroid.lon];
     }
-    return [18.4200, 72.8100];
+    return [0, 0];
   }, [spill]);
 
   // Backward drift coordinates array for polyline
@@ -144,10 +144,12 @@ export function MaritimeMap({
     return drift.backward_track.map(pt => [pt.lat, pt.lon]);
   }, [drift]);
 
-  // Forward forecast coordinates
+  // Forward forecast coordinates (filter out tracks with fewer than 2 points)
   const forecastPolylines = useMemo(() => {
     if (!drift?.forecast_tracks) return [];
-    return drift.forecast_tracks.map(tr => tr.points.map(pt => [pt.lat, pt.lon]));
+    return drift.forecast_tracks
+      .map(tr => (Array.isArray(tr.points) ? tr.points.map(pt => [pt.lat, pt.lon]) : []))
+      .filter(track => track.length >= 2);
   }, [drift]);
 
   return (
@@ -158,24 +160,24 @@ export function MaritimeMap({
           <Compass size={13} />
           <span>
             {spill?.centroid 
-              ? `${Math.abs(spill.centroid.lat).toFixed(2)}° N, ${Math.abs(spill.centroid.lon).toFixed(2)}° E` 
-              : '18.42° N, 72.81° E'}
+              ? `${Math.abs(spill.centroid.lat).toFixed(2)}° ${spill.centroid.lat >= 0 ? 'N' : 'S'}, ${Math.abs(spill.centroid.lon).toFixed(2)}° ${spill.centroid.lon >= 0 ? 'E' : 'W'}` 
+              : 'No Incident Centroid'}
           </span>
         </div>
       </div>
 
       <MapContainer 
         center={defaultCenter} 
-        zoom={9} 
+        zoom={spill?.centroid ? 9 : 2} 
         scrollWheelZoom={true}
         className="leaflet-container-custom"
       >
         {/* Bounds controller */}
         {spill && <MapBoundsController bbox={spill.bounding_box} centroid={spill.centroid} />}
 
-        {/* Satellite Map Tile Layer (Esri World Imagery or CartoDB Voyager) */}
+        {/* Satellite Map Tile Layer */}
         <TileLayer
-          attribution='&copy; <a href="https://www.esri.com/">Esri</a> &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+          attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
           url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           maxZoom={18}
         />
@@ -291,10 +293,9 @@ export function MaritimeMap({
         {/* 6. Candidate Vessel Trajectories & Markers */}
         {candidates.map((vessel) => {
           const isSelected = vessel.mmsi === selectedMmsi;
-          const trajectoryPoints = vessel.trajectory?.map(pt => [pt.lat, pt.lon]) || [];
-          const lastPoint = trajectoryPoints.length > 0 
-            ? trajectoryPoints[trajectoryPoints.length - 1] 
-            : (drift?.origin_coordinates ? [drift.origin_coordinates.lat, drift.origin_coordinates.lon] : (spill?.centroid ? [spill.centroid.lat, spill.centroid.lon] : null));
+          const trajectoryPoints = Array.isArray(vessel.trajectory) ? vessel.trajectory.map(pt => [pt.lat, pt.lon]) : [];
+          // Only render marker if vessel has at least one valid trajectory coordinate
+          const lastPoint = trajectoryPoints.length > 0 ? trajectoryPoints[trajectoryPoints.length - 1] : null;
 
           if (!lastPoint) return null;
 

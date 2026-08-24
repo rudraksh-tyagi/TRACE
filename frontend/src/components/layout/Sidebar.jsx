@@ -1,4 +1,3 @@
-import React from 'react';
 import { 
   LayoutDashboard, 
   Droplet, 
@@ -6,8 +5,7 @@ import {
   Ship, 
   Target, 
   FileText,
-  Server,
-  Activity
+  Server
 } from 'lucide-react';
 
 export function Sidebar({ activeTab, setActiveTab, health }) {

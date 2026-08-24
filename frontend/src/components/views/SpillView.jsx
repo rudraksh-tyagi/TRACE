@@ -1,5 +1,4 @@
-import React from 'react';
-import { Droplet, ShieldCheck, Maximize, Clock, MapPin, AlertTriangle, Layers, Satellite, FileText } from 'lucide-react';
+import { Droplet, Maximize, MapPin, Satellite } from 'lucide-react';
 import { MaritimeMap } from '../map/MaritimeMap';
 
 export function SpillView({ incident, candidates, selectedMmsi, onSelectCandidate, visibility, onToggleLayer }) {

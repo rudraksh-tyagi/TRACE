@@ -1,5 +1,4 @@
-import React from 'react';
-import { Wind, Target, Clock, Compass, Navigation, Layers } from 'lucide-react';
+import { Wind, Target, Compass, Navigation } from 'lucide-react';
 import { MaritimeMap } from '../map/MaritimeMap';
 import { TimeSlider } from '../dashboard/TimeSlider';
 
@@ -111,8 +110,8 @@ export function DriftView({ incident, candidates, selectedMmsi, onSelectCandidat
                     <tr key={idx}>
                       <td>{idx + 1}</td>
                       <td>{new Date(pt.timestamp).toUTCString().slice(0, 22)}</td>
-                      <td>{pt.lat.toFixed(4)}° N</td>
-                      <td>{pt.lon.toFixed(4)}° E</td>
+                      <td>{Math.abs(pt.lat).toFixed(4)}° {pt.lat >= 0 ? 'N' : 'S'}</td>
+                      <td>{Math.abs(pt.lon).toFixed(4)}° {pt.lon >= 0 ? 'E' : 'W'}</td>
                     </tr>
                   ))}
                 </tbody>

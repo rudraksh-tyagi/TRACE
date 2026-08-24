@@ -69,14 +69,14 @@ export function Header({ health, incidentId, lastUpdated, onRefresh, onRunPipeli
 
       <div className="header-right">
         {/* System Connection Status */}
-        <div className={`status-pill ${health?.online ? 'online' : 'offline'}`}>
+        <div className={`status-pill ${health?.online ? (health?.mockMode ? 'warning' : 'online') : 'offline'}`}>
           <span className="status-dot"></span>
           <div className="status-text">
             <span className="status-title">
-              {health?.online ? 'SYSTEM ONLINE' : 'BACKEND OFFLINE'}
+              {health?.online ? (health?.mockMode ? 'DEMO MODE' : 'SYSTEM ONLINE') : 'BACKEND OFFLINE'}
             </span>
             <span className="status-desc">
-              {health?.online ? 'FastAPI Connected' : 'Backend Unreachable'}
+              {health?.online ? (health?.mockMode ? 'Mock Data Active' : 'FastAPI Connected') : 'Backend Unreachable'}
             </span>
           </div>
         </div>

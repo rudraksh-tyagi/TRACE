@@ -1,6 +1,4 @@
-import React from 'react';
-import { FileText, CheckCircle2, ShieldAlert, Award, Ship, Satellite, ChevronRight } from 'lucide-react';
-import { EvidencePanel } from '../attribution/EvidencePanel';
+import { FileText, CheckCircle2, ShieldAlert, Award, Ship } from 'lucide-react';
 import { SatelliteEvidence } from '../attribution/SatelliteEvidence';
 import { VesselSpotlightCard } from '../vessels/VesselSpotlightCard';
 
@@ -59,13 +57,13 @@ export function EvidenceView({ incident, candidates, selectedMmsi, onSelectCandi
               <div className="check-item">
                 <CheckCircle2 size={16} className="text-success" />
                 <div className="check-content">
-                  <strong>Spatial Compatibility:</strong> Min distance {selectedCandidate.minimum_distance_km} km to origin.
+                  <strong>Spatial Compatibility:</strong> {typeof selectedCandidate.minimum_distance_km === 'number' ? `Min distance ${selectedCandidate.minimum_distance_km} km to origin.` : `Min distance unavailable.`}
                 </div>
               </div>
               <div className="check-item">
                 <CheckCircle2 size={16} className="text-success" />
                 <div className="check-content">
-                  <strong>Time Compatibility:</strong> Present during source time window ({selectedCandidate.source_window_presence ? 'Yes' : 'No'}).
+                  <strong>Time Compatibility:</strong> Present during source time window ({selectedCandidate.source_window_presence === true ? 'Yes' : (selectedCandidate.source_window_presence === false ? 'No' : 'Unknown')}).
                 </div>
               </div>
               <div className="check-item">
@@ -77,7 +75,7 @@ export function EvidenceView({ incident, candidates, selectedMmsi, onSelectCandi
               <div className="check-item">
                 <CheckCircle2 size={16} className="text-success" />
                 <div className="check-content">
-                  <strong>Behavioural Evidence:</strong> AIS gap detected ({selectedCandidate.ais_gap_detected ? 'Yes - Anomaly Recorded' : 'No Gaps'}).
+                  <strong>Behavioural Evidence:</strong> AIS gap detected ({selectedCandidate.ais_gap_detected === true ? 'Yes - Anomaly Recorded' : (selectedCandidate.ais_gap_detected === false ? 'No Gaps' : 'Unknown')}).
                 </div>
               </div>
             </div>

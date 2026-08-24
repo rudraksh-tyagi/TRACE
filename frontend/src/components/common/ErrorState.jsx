@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertOctagon, RefreshCw } from 'lucide-react';
 
 export function ErrorState({ error, onRetry }) {

@@ -1,13 +1,19 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-export function PipelineProgress() {
+export function PipelineProgress({ incident }) {
+  const isDetected = Boolean(incident?.spill?.detected);
+  const isMapped = Boolean(incident?.spill?.polygon_geojson);
+  const isSourceEstimated = Boolean(incident?.drift?.origin_coordinates);
+  const isVesselsAnalyzed = Array.isArray(incident?.ranked_candidates) && incident.ranked_candidates.length > 0;
+  const isAttributed = Boolean(incident?.metadata?.generation_timestamp);
+
   const steps = [
-    { num: 1, label: 'DETECTED', done: true },
-    { num: 2, label: 'MAPPED', done: true },
-    { num: 3, label: 'SOURCE ESTIMATED', done: true },
-    { num: 4, label: 'VESSELS ANALYZED', done: true },
-    { num: 5, label: 'ATTRIBUTION', done: true },
+    { num: 1, label: 'DETECTED', done: isDetected },
+    { num: 2, label: 'MAPPED', done: isMapped },
+    { num: 3, label: 'SOURCE ESTIMATED', done: isSourceEstimated },
+    { num: 4, label: 'VESSELS ANALYZED', done: isVesselsAnalyzed },
+    { num: 5, label: 'ATTRIBUTION', done: isAttributed },
   ];
 
   return (

@@ -47,7 +47,7 @@ export async function fetchApi(endpoint, options = {}) {
     return await response.json();
   } catch (error) {
     if (error.name === 'TypeError' || error.message.toLowerCase().includes('fetch') || error.message.toLowerCase().includes('network')) {
-      throw new Error('Backend unreachable. Make sure the TRACE backend server is running at ' + BASE_URL);
+      throw new Error('Backend unreachable. Make sure the TRACE backend server is running at ' + BASE_URL, { cause: error });
     }
     throw error;
   }

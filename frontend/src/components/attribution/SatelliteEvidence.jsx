@@ -1,4 +1,3 @@
-import React from 'react';
 import { Satellite, Image, Layers, ArrowRight } from 'lucide-react';
 
 export function SatelliteEvidence({ spill }) {

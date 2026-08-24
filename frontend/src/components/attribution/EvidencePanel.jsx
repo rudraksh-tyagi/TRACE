@@ -1,4 +1,3 @@
-import React from 'react';
 import { FileText, CheckCircle2, ShieldAlert, Award } from 'lucide-react';
 
 export function EvidencePanel({ candidate }) {

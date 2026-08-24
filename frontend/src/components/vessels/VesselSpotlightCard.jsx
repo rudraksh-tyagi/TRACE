@@ -1,5 +1,4 @@
-import React from 'react';
-import { Ship, Navigation, Gauge, Clock, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { Ship, Navigation, Gauge, Clock, AlertTriangle } from 'lucide-react';
 
 export function VesselSpotlightCard({ vessel }) {
   if (!vessel) return null;
@@ -30,19 +29,19 @@ export function VesselSpotlightCard({ vessel }) {
         <div className="feature-item">
           <Gauge size={13} className="feature-icon" />
           <span className="feature-label">Average Speed</span>
-          <span className="feature-val">{vessel.average_speed != null ? `${vessel.average_speed} knots` : 'N/A'}</span>
+          <span className="feature-val">{typeof vessel.average_speed === 'number' ? `${vessel.average_speed} knots` : 'Unavailable'}</span>
         </div>
 
         <div className="feature-item">
           <Navigation size={13} className="feature-icon" />
           <span className="feature-label">Mean Course</span>
-          <span className="feature-val">{vessel.course != null ? `${vessel.course}°` : 'N/A'}</span>
+          <span className="feature-val">{typeof vessel.course === 'number' ? `${vessel.course}°` : 'Unavailable'}</span>
         </div>
 
         <div className="feature-item">
           <Clock size={13} className="feature-icon" />
           <span className="feature-label">Time Near Source</span>
-          <span className="feature-val">{vessel.time_spent_near_source_min != null ? `${vessel.time_spent_near_source_min} min` : 'N/A'}</span>
+          <span className="feature-val">{typeof vessel.time_spent_near_source_min === 'number' ? `${vessel.time_spent_near_source_min} min` : 'Unavailable'}</span>
         </div>
       </div>
 

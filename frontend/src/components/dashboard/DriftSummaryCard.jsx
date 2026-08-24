@@ -1,4 +1,3 @@
-import React from 'react';
 import { Wind, Target, Clock, Compass, Navigation } from 'lucide-react';
 
 export function DriftSummaryCard({ drift }) {

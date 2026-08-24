@@ -1,4 +1,3 @@
-import React from 'react';
 import { Droplet, ShieldCheck, Maximize, Clock, MapPin, AlertTriangle } from 'lucide-react';
 
 export function SpillIntelligenceCards({ spill }) {

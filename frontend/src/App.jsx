@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { useIncidentData } from './hooks/useIncidentData';
 import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
 import { ErrorState } from './components/common/ErrorState';
 import { LoadingSkeleton } from './components/common/LoadingSkeleton';
+import { StaleDataBanner } from './components/common/StaleDataBanner';
 
 import { OverviewView } from './components/views/OverviewView';
 import { SpillView } from './components/views/SpillView';
@@ -137,6 +138,7 @@ function App() {
 
         {/* 3. Main Dashboard Canvas */}
         <main className="trace-main-content">
+          <StaleDataBanner error={error} onRetry={refreshData} loading={loading} />
           {renderActiveView()}
         </main>
       </div>

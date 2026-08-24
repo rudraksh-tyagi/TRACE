@@ -1,4 +1,3 @@
-import React from 'react';
 import { Ship, ChevronRight, AlertCircle, CheckCircle2, XCircle } from 'lucide-react';
 
 export function VesselTable({ candidates, selectedMmsi, onSelectCandidate }) {
@@ -10,13 +9,16 @@ export function VesselTable({ candidates, selectedMmsi, onSelectCandidate }) {
   };
 
   const getPresenceBadge = (vessel) => {
-    if (vessel.source_window_presence) {
+    if (vessel.source_window_presence === true) {
       return <span className="presence-yes"><CheckCircle2 size={13} /> Yes</span>;
     }
-    if (vessel.time_spent_near_source_min > 0) {
+    if (vessel.source_window_presence === false) {
+      return <span className="presence-no"><XCircle size={13} /> No</span>;
+    }
+    if (typeof vessel.time_spent_near_source_min === 'number' && vessel.time_spent_near_source_min > 0) {
       return <span className="presence-partial"><AlertCircle size={13} /> Partial</span>;
     }
-    return <span className="presence-no"><XCircle size={13} /> No</span>;
+    return <span className="presence-unknown text-muted">Unknown</span>;
   };
 
   return (
